@@ -28,10 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter_barcode_scanner: ^2.0.0
-  geolocator: ^7.7.0
-  location: ^4.1.1
   permission_handler: ^11.0.1
+  geolocator: ^7.7.0
 
   flutter:
     sdk: flutter
@@ -61,6 +59,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/logofix.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
