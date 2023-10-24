@@ -3,8 +3,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_attendance_app/splashscreen.dart';
 import 'package:get_attendance_app/home.dart';
-import 'barcode_scanner_page.dart'; // Import the BarcodeScannerPage
-import 'face_scan_page.dart'; // Import the FaceScanPage
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,12 +47,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Fingerprint Auth",
-      initialRoute: '/face', // Set the initial route to splash
+      initialRoute: '/splash', // Set the initial route to splash
       routes: {
         '/splash': (context) => SplashScreen(),
         '/home': (context) => HomePage(),
-        '/face': (context) => FaceScanPage(),
-        '/barcode': (context) => BarcodeScanner(),
+
       },
     );
   }
