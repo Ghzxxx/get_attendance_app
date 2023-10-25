@@ -4,33 +4,29 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_attendance_app/splashscreen.dart';
 import 'package:get_attendance_app/home.dart';
-
-
+import 'package:get_attendance_app/locationdeniedscreen.dart'; // Import the new file
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await requestLocationPermission();
-
-  runApp(MyApp());
+  runApp(await determineStartingScreen());
 }
 
-Future<void> requestLocationPermission() async {
-  final status = await Permission.location.request();
+Future<Widget> determineStartingScreen() async {
+  if (await Permission.location.isDenied) {
+    // Permission denied, request location permission again
+    await Permission.location.request();
+  }
 
-  if (status.isGranted) {
+  if (await Permission.location.isGranted) {
     // Permission granted, you can now proceed with location-related tasks
     startLocationTracking();
     print('Location permission granted');
-    runApp(MyApp());
-  } else if (status.isDenied) {
-    // Permission denied, handle it or show a message to the user
-    print('Location permission denied');
-    Map<Permission,PermissionStatus> status = await [Permission.location,
-    ].request();
-  } else if (status.isPermanentlyDenied) {
-    // Permission permanently denied, open app settings to allow permission
-    openAppSettings();
-    print('Location permission permanently denied');
+    return MyApp();
+  } else {
+    // Return the location denied screen
+    return MaterialApp(
+      home: LocationDeniedScreen(),
+    );
   }
 }
 
@@ -43,22 +39,20 @@ void startLocationTracking() {
   });
 }
 
-
 class MyApp extends StatelessWidget {
+  static final navKey = new GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      key: navKey,
       debugShowCheckedModeBanner: false,
-      title: "Fingerprint Auth",
+      title: "Attendance App",
       initialRoute: '/splash', // Set the initial route to splash
       routes: {
         '/splash': (context) => SplashScreen(),
         '/home': (context) => HomePage(),
         '/qr': (context) => QRCodeScreen(),
-
-
-
-
       },
     );
   }
