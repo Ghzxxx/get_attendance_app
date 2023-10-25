@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get_attendance_app/qrcode_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_attendance_app/splashscreen.dart';
 import 'package:get_attendance_app/home.dart';
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +54,10 @@ class MyApp extends StatelessWidget {
       routes: {
         '/splash': (context) => SplashScreen(),
         '/home': (context) => HomePage(),
+        '/qr': (context) => QRCodeScreen(),
+
+
+
 
       },
     );

@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Delay for a moment before navigating to the login page
     Future.delayed(Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/home'); // Navigate to home page
+      Navigator.of(context).pushReplacementNamed('/qr'); // Navigate to home page
     });
   }
 
