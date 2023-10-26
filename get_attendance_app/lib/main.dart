@@ -6,6 +6,7 @@ import 'package:get_attendance_app/splashscreen.dart';
 import 'package:get_attendance_app/home.dart';
 import 'package:get_attendance_app/locationdeniedscreen.dart'; // Import the new file
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(await determineStartingScreen());

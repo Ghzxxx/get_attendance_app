@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_attendance_app/qr_utils.dart';
+import 'package:get_attendance_app/face_scan_scaneer.dart'; // Ubahlah sesuai dengan nama file yang benar
 
 class QRCodeScreen extends StatefulWidget {
   @override
@@ -21,6 +22,10 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
       setState(() {
         barcode = barcodeScanRes;
       });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => FaceScanScreen()), // Ubahlah sesuai dengan nama file yang benar
+      );
     }
   }
 
