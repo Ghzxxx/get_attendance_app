@@ -1,11 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get_attendance_app/face_scan_scaneer.dart';
-import 'package:get_attendance_app/home.dart';
-import 'package:get_attendance_app/qr_utils.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
-import 'package:camera/camera.dart';
-import 'facemcapture.dart'; // Pastikan impor ini ada
+
 
 class QRCodeScreen extends StatefulWidget {
   @override
@@ -14,9 +11,7 @@ class QRCodeScreen extends StatefulWidget {
 
 class _QRCodeScreenState extends State<QRCodeScreen> {
   String barcode = "";
-  CameraDescription? camera; // Define the 'camera' variable here
-  CameraController? _controller;
-
+  late CameraDescription camera; // Change to 'late' modifier
 
   @override
   void initState() {
@@ -38,11 +33,11 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
       setState(() {
         barcode = barcodeScanRes;
       });
-      if (_controller != null) {
+      if (camera != null) { // Change '_controller' to 'camera'
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FaceCapturePage(controller: _controller!),
+            builder: (context) => CameraPage(cameras: [camera],),
           ),
         );
       }
@@ -59,8 +54,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
-
+            // Add your widgets here
           ],
         ),
       ),

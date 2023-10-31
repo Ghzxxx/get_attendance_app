@@ -7,7 +7,7 @@ import 'package:get_attendance_app/home.dart';
 import 'package:get_attendance_app/locationdeniedscreen.dart';
 import 'package:camera/camera.dart';
 
-import 'facemcapture.dart';
+
 
 
 void main() async {
@@ -33,7 +33,7 @@ Future<Widget> determineStartingScreen() async {
     await Permission.camera.request();
   }
 
-  if (await Permission.location.isGranted && await Permission.camera.isGranted) {
+  if (await Permission.location.isGranted && await Permission.camera.isGranted && await Permission.microphone.isGranted) {
     // Permission granted, you can now proceed with location-related tasks
     startLocationTracking();
     print('Location permission granted');
