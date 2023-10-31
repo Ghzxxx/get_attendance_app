@@ -36,7 +36,7 @@ class LocationDeniedScreen extends StatelessWidget {
           children: [
             const Center(
               child: Text(
-                "Location Permission Denied",
+                "Location or Camera Permission is Denied",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 48.0,
@@ -45,61 +45,56 @@ class LocationDeniedScreen extends StatelessWidget {
               ),
             ),
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 50.0),
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: const Text(
-                      "The app cannot run without location permission.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, height: 1.5),
-                    ),
+              margin: const EdgeInsets.symmetric(vertical: 15.0),
+              child: const Text(
+                "The app cannot run without location permission.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, height: 1.5),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 15.0),
+              width: double.infinity,
+              child: FloatingActionButton(
+                onPressed: () {
+                  openAppSettings();
+                },
+                elevation: 10.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 14.0),
+                  child: Text(
+                    "Open Setting",
+                    style: TextStyle(color: Colors.white),
                   ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 15.0),
-                    width: double.infinity,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        openAppSettings();
-                      },
-
-                      elevation: 10.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 14.0),
-                        child: Text(
-                          "Open Setting",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 15.0),
+              width: double.infinity,
+              child: FloatingActionButton(
+                onPressed: exitApp,
+                elevation: 10.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 14.0),
+                  child: Text(
+                    "Exit",
+                    style: TextStyle(color: Colors.white),
                   ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 15.0),
-                    width: double.infinity,
-                    child: FloatingActionButton(
-                      onPressed: exitApp,
-                      elevation: 10.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 14.0),
-                        child: Text(
-                          "Exit",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
+                ),
               ),
             )
+
+
+
           ],
         ),
       ),

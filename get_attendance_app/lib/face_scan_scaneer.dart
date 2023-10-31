@@ -1,120 +1,265 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:get_attendance_app/attendance_page.dart';
+import 'package:get_attendance_app/home.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 
 
-class FaceScanScreen extends StatefulWidget {
+// class FaceScanScreen extends StatefulWidget {
+//   @override
+//   _FaceScanScreenState createState() => _FaceScanScreenState();
+// }
+//
+//
+
+
+class CameraPage extends StatefulWidget {
+  const CameraPage({Key? key, required this.cameras}) : super(key: key);
+
+  final List<CameraDescription>? cameras;
+
   @override
-  _FaceScanScreenState createState() => _FaceScanScreenState();
+  State<CameraPage> createState() => _CameraPageState();
 }
 
-class _FaceScanScreenState extends State<FaceScanScreen> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-  int _timerSeconds = 5;
-  bool _isTimerActive = false;
-  late String _imageName;
-  late String _fileName;
+class _CameraPageState extends State<CameraPage> {
+  late CameraController _cameraController;
+  bool _isRearCameraSelected = true;
+
+  @override
+  void dispose() {
+    _cameraController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
+    initCamera(widget.cameras![0]);
   }
 
-  void _initializeCamera() async {
-    final cameras = await availableCameras();
-    final frontCamera = cameras.firstWhere(
-            (camera) => camera.lensDirection == CameraLensDirection.front);
-    _controller = CameraController(frontCamera, ResolutionPreset.medium);
-    _initializeControllerFuture = _controller.initialize();
-    setState(() {});
-  }
-
-  void startTimer() {
-    _isTimerActive = true;
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        if (_timerSeconds > 0) {
-          _timerSeconds--;
-          startTimer();
-        } else {
-          _isTimerActive = false;
-          _captureImage();
-        }
-      });
-    });
-  }
-
-  void _captureImage() async {
+  Future takePicture() async {
+    if (!_cameraController.value.isInitialized) {
+      return null;
+    }
+    if (_cameraController.value.isTakingPicture) {
+      return null;
+    }
     try {
-      await _initializeControllerFuture;
-      final XFile image = await _controller.takePicture();
-      final appDir = await getApplicationDocumentsDirectory();
-      _fileName = 'image_${DateTime.now().millisecondsSinceEpoch}.png';
-      final savedImage = File('${appDir.path}/$_fileName');
-      final bytes = await File(image.path).readAsBytes();
-      await savedImage.writeAsBytes(bytes);
-      print('Gambar disimpan sebagai $_fileName');
-      _imageName = _fileName;
+      await _cameraController.setFlashMode(FlashMode.off);
+      XFile picture = await _cameraController.takePicture();
       Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => AttendancePage(imagePath: savedImage.path)),
-      );
-    } catch (e) {
-      print(e);
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(
+              )));
+    } on CameraException catch (e) {
+      debugPrint('Error occured while taking picture: $e');
+      return null;
     }
   }
 
-
-
-
-
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  Future initCamera(CameraDescription cameraDescription) async {
+    _cameraController =
+        CameraController(cameraDescription, ResolutionPreset.high);
+    try {
+      await _cameraController.initialize().then((_) {
+        if (!mounted) return;
+        setState(() {});
+      });
+    } on CameraException catch (e) {
+      debugPrint("camera error $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Face Scanner'),
-      ),
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (!_isTimerActive) {
-              startTimer();
-            }
-            return Stack(
-              children: [
-                CameraPreview(_controller),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Waktu tersisa: $_timerSeconds',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
-    );
+        body: SafeArea(
+          child: Stack(children: [
+            (_cameraController.value.isInitialized)
+                ? CameraPreview(_cameraController)
+                : Container(
+                color: Colors.black,
+                child: const Center(child: CircularProgressIndicator())),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.20,
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                      color: Colors.black),
+                  child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                    Expanded(
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          iconSize: 30,
+                          icon: Icon(
+                              _isRearCameraSelected
+                                  ? CupertinoIcons.switch_camera
+                                  : CupertinoIcons.switch_camera_solid,
+                              color: Colors.white),
+                          onPressed: () {
+                            setState(
+                                    () => _isRearCameraSelected = !_isRearCameraSelected);
+                            initCamera(widget.cameras![_isRearCameraSelected ? 0 : 1]);
+                          },
+                        )),
+                    Expanded(
+                        child: IconButton(
+                          onPressed: takePicture,
+                          iconSize: 50,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.circle, color: Colors.white),
+                        )),
+                    const Spacer(),
+                  ]),
+                )),
+          ]),
+        ));
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+// class _FaceScanScreenState extends State<FaceScanScreen> {
+//   late CameraController _controller;
+//   late Future<void> _initializeControllerFuture;
+//   int _timerSeconds = 3;
+//   bool _isTimerActive = false;
+//   late String _imageName;
+//   late String _fileName;
+//   bool _isCameraStreaming = false;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     _initializeCamera();
+//   }
+//
+//   void _initializeCamera() async {
+//     final cameras = await availableCameras();
+//     final frontCamera = cameras.firstWhere(
+//             (camera) => camera.lensDirection == CameraLensDirection.front);
+//     _controller = CameraController(frontCamera, ResolutionPreset.veryHigh);
+//     _initializeControllerFuture = _controller.initialize();
+//     setState(() {});
+//   }
+//
+//
+//
+//
+//   void _captureImage() async {
+//
+//     try {
+//       await _initializeControllerFuture;
+//
+//       if (!_isCameraStreaming) {
+//         // If the camera is streaming images, stop it
+//         await _controller.startImageStream((CameraImage image) async {
+//
+//       // await _initializeControllerFuture;
+//       // final XFile image = await _controller.takePicture();
+//       // final appDir = await getApplicationDocuxmentsDirectory();
+//       // _fileName = 'image_${DateTime.now().millisecondsSinceEpoch}.png';
+//       // final savedImage = File('${appDir.path}/$_fileName');
+//       // final bytes = await File(image.path).readAsBytes();
+//       // await savedImage.writeAsBytes(bytes);
+//       // print('Gambar disimpan sebagai $_fileName');
+//       // _imageName = _fileName;
+//           await _controller.stopImageStream();
+//           _isCameraStreaming = false;
+//         });
+//       }
+//       _isCameraStreaming = true;
+//       Navigator.push(
+//         context,
+//         MaterialPageRoute(builder: (context) => HomePage()),
+//       );
+//     } catch (e) {
+//       print(e);
+//     }
+//   }
+//
+//   void startTimer() {
+//     _isTimerActive = true;
+//     Future.delayed(Duration(seconds: 1), () {
+//       setState(() {
+//         if (_timerSeconds > 0) {
+//           _timerSeconds--;
+//           startTimer();
+//         } else {
+//           _isTimerActive = false;
+//           _captureImage();
+//         }
+//       });
+//     });
+//   }
+//
+//
+//
+//
+//   @override
+//   void dispose() {
+//     _controller?.dispose();
+//     super.dispose();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: FutureBuilder<void>(
+//         future: _initializeControllerFuture,
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.done) {
+//             if (!_isTimerActive) {
+//               startTimer();
+//             }
+//             return Stack(
+//               children: [
+//                 CameraPreview(_controller),
+//                 Align(
+//                   alignment: Alignment.topCenter,
+//                   child: Padding(
+//                     padding: const EdgeInsets.all(16.0),
+//                     child: Text(
+//                       'Waktu tersisa: $_timerSeconds',
+//                       style: TextStyle(
+//                         color: Colors.white,
+//                         fontSize: 15.0,
+//                         fontWeight: FontWeight.bold,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             );
+//           } else {
+//             return Center(
+//               child: CircularProgressIndicator(),
+//             );
+//           }
+//         },
+//       ),
+//     );
+//   }
+// }

@@ -4,7 +4,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_attendance_app/splashscreen.dart';
 import 'package:get_attendance_app/home.dart';
-import 'package:get_attendance_app/locationdeniedscreen.dart'; // Import the new file
+import 'package:get_attendance_app/locationdeniedscreen.dart';
+import 'package:camera/camera.dart';
+
+import 'facemcapture.dart';
 
 
 void main() async {
@@ -12,13 +15,25 @@ void main() async {
   runApp(await determineStartingScreen());
 }
 
+Future<void> initializeCameraAndPermissions() async {
+  // Initialize the camera
+  final cameras = await availableCameras();
+  CameraDescription camera = cameras.first; // Choose the desired camera
+  CameraController cameraController = CameraController(camera, ResolutionPreset.high);
+  await cameraController.initialize();
+
+  // Initialize location permission
+  await Permission.location.request();
+}
+
 Future<Widget> determineStartingScreen() async {
   if (await Permission.location.isDenied) {
     // Permission denied, request location permission again
     await Permission.location.request();
+    await Permission.camera.request();
   }
 
-  if (await Permission.location.isGranted) {
+  if (await Permission.location.isGranted && await Permission.camera.isGranted) {
     // Permission granted, you can now proceed with location-related tasks
     startLocationTracking();
     print('Location permission granted');
