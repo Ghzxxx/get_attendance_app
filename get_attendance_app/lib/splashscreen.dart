@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_attendance_app/home.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -12,17 +13,45 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Simulate some loading or initialization process
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        _loading = false;
-      });
-    });
 
-    // Delay for a moment before navigating to the login page
+    // Delay for a moment before navigating to the next screen
     Future.delayed(Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/qr'); // Navigate to home page
+      _checkLocationAndNavigate();
     });
+  }
+
+  Future<void> _checkLocationAndNavigate() async {
+    // Check if the location is within 5-10 meters from the target coordinates
+    final targetCoordinates = Position(
+      latitude: -8.132937,
+      longitude: 112.563975,
+      accuracy: 0.0,
+      altitude: 0.0,
+      heading: 0.0,
+      speed: 0.0,
+      speedAccuracy: 0.0,
+      timestamp: DateTime.now(),
+    );
+    final currentCoordinates = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.best,
+
+
+    );
+
+    final distanceInMeters = Geolocator.distanceBetween(
+      targetCoordinates.latitude,
+      targetCoordinates.longitude,
+      currentCoordinates.latitude,
+      currentCoordinates.longitude,
+    );
+
+    if (distanceInMeters <= 15) {
+      Navigator.of(context).pushReplacementNamed('/qrcode');
+      print('Location is on range');// Navigate to the next screen
+    } else {
+      Navigator.of(context).pushReplacementNamed('/far');
+      print('Location far');// Navigate to the location denied screen
+    }
   }
 
   @override
@@ -48,4 +77,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

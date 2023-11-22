@@ -1,6 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:get_attendance_app/sender.dart';
 import 'attendance_page.dart';
+import 'datapage.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({Key? key, required this.cameras}) : super(key: key);
@@ -16,12 +18,6 @@ class _CameraPageState extends State<CameraPage> {
   bool _isCameraReady = false;
 
   @override
-  void dispose() {
-    _cameraController.dispose();
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
     _initializeCamera();
@@ -31,18 +27,27 @@ class _CameraPageState extends State<CameraPage> {
     if (!_isCameraReady || _cameraController.value.isTakingPicture) {
       return;
     }
-
     try {
       final XFile picture = await _cameraController.takePicture();
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AttendancePage(imagePath: picture.path),
+          builder: (context) => DataPage(),
+
         ),
       );
-    } on CameraException catch (e) {
+
+
+      if (result == 'picture_taken') {
+        _cameraController.dispose();
+        Navigator.pop(context); // Pop the current route
+      }
+
+    }
+    on CameraException catch (e) {
       debugPrint('Error occurred while taking picture: $e');
     }
+
   }
 
   Future<void> _initializeCamera() async {
@@ -71,6 +76,11 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,18 +98,18 @@ class _CameraPageState extends State<CameraPage> {
             CameraPreview(_cameraController),
             Align(
               alignment: Alignment.bottomCenter,
-              child: GestureDetector(
-                onTap: takePicture,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  padding: EdgeInsets.all(20.0),
-                  child: Icon(
-                    Icons.camera_alt,
-                    size: 40.0,
-                    color: Colors.black,
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.20,
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    color: Colors.black),
+                child: Center(
+                  child: IconButton(
+                    onPressed: takePicture,
+                    iconSize: 75,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(Icons.circle, color: Colors.white),
                   ),
                 ),
               ),
