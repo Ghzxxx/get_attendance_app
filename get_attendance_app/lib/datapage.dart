@@ -20,22 +20,22 @@ class _DataPageState extends State<DataPage> {
   }
 
   Future<void> fetchDataOptions() async {
-    final apiUrl = 'https://testingapi'; // Replace with your actual API endpoint
+    final apiUrl = 'https://testingapi';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
-        // Parse the response body and extract data options
+
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
           dataOptions = responseData.map((data) => data.toString()).toList();
         });
       } else {
-        // Handle error response
+
         print('Failed to fetch data options. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle network error
+
       print('Error fetching data options: $e');
     }
   }
