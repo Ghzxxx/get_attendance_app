@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'ThankYouPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -49,21 +50,17 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
 
   Future<void> sendAttendanceData(int selectedId) async {
     if (selectedData != null) {
-      // Replace the following with your actual API endpoint and logic to send data to the database
       final apiUrl = 'http://10.0.2.2:8000/api/receive-data';
       final Map<String, dynamic> requestData = {
         'selectedId': selectedId.toString(),
-        // 'image' is the key for the image in the request
       };
 
       try {
         var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-        // Add other form data to the request
         requestData.forEach((key, value) {
           request.fields[key] = value.toString();
         });
 
-        // Attach the image file to the request
         request.files.add(http.MultipartFile(
           'image',
           widget.imageFile.readAsBytes().asStream(),
@@ -74,17 +71,37 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
         final response = await request.send();
 
         if (response.statusCode == 200) {
-          // Handle successful response
           print('Attendance data and image sent successfully');
+
+          // Show dialog and navigate to ThankYouPage
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Anda sudah login'),
+                content: Text('Terima kasih sudah login.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ThankYouPage()),
+                      );
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
         } else {
-          // Handle error response
           print('Failed to send attendance data and image. Status code: ${response.statusCode}');
         }
       } catch (e) {
         print('Error sending attendance data and image: $e');
       }
     } else {
-      // Show an error message if no data option is selected
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -94,7 +111,7 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(); // Close the dialog
                 },
                 child: Text('OK'),
               ),
@@ -165,7 +182,6 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
               child: FloatingActionButton(
                 onPressed: () {
                   if (selectedData != null) {
-                    // Implement your logic when the user clicks the button
                     sendAttendanceData(selectedData!['id']);
                   } else {
                     showDialog(
