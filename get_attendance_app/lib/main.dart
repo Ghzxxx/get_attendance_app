@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_attendance_app/datapage.dart';
 import 'package:get_attendance_app/locationfar.dart';
 import 'package:get_attendance_app/qrcode_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -7,6 +8,10 @@ import 'package:get_attendance_app/splashscreen.dart';
 import 'package:get_attendance_app/home.dart';
 import 'package:get_attendance_app/locationdeniedscreen.dart';
 import 'package:camera/camera.dart';
+import 'datapage.dart';
+import 'dart:io';
+
+import 'displayname.dart';
 
 
 
@@ -72,6 +77,8 @@ class MyApp extends StatelessWidget {
         '/qr': (context) => QRCodeScreen(),
         '/far': (context) => LocationFarScreen(),
         '/qrcode': (context) => QRCodeScreen(),
+        //'/display': (context) => DisplayNamesPage(imageFile: null,),
+
 
       },
     );

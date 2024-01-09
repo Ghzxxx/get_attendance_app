@@ -1,79 +1,82 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:io';
 
 class DataPage extends StatefulWidget {
+  final File imageFile;
+
+  DataPage({Key? key, required this.imageFile}) : super(key: key);
+
   @override
   _DataPageState createState() => _DataPageState();
 }
 
 class _DataPageState extends State<DataPage> {
-  late List<String> dataOptions = []; // Initialize to an empty list
-
-  String selectedData = "";
+  late List<Map<String, dynamic>> dataOptions = [];
+  Map<String, dynamic> selectedData = {};
 
   @override
   void initState() {
     super.initState();
-    // Fetch data from the web API when the widget is initialized
     fetchDataOptions();
   }
 
   Future<void> fetchDataOptions() async {
-    final apiUrl = 'https://testingapi';
-
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.get(Uri.parse('http://10.0.2.2/api/peserta-names'));
       if (response.statusCode == 200) {
-
         final List<dynamic> responseData = json.decode(response.body);
+        List<Map<String, dynamic>> options = List<Map<String, dynamic>>.from(responseData);
         setState(() {
-          dataOptions = responseData.map((data) => data.toString()).toList();
+          dataOptions = options;
         });
       } else {
-
         print('Failed to fetch data options. Status code: ${response.statusCode}');
       }
     } catch (e) {
-
       print('Error fetching data options: $e');
     }
   }
 
-  Future<void> sendAttendanceData() async {
+  Future<void> sendAttendanceData(int selectedId) async {
     // Replace the following with your actual API endpoint and logic to send data to the database
-    final apiUrl = 'https://testingapi';
+    final apiUrl = 'http://10.0.2.2/api/receive-data';
     final Map<String, dynamic> requestData = {
-      'selectedData': selectedData,
+      'selectedId': selectedId,
       // Add any additional data you want to send to the database
     };
 
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        body: json.encode(requestData),
-        headers: {'Content-Type': 'application/json'},
-      );
+      var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+      // Add other form data to the request
+      requestData.forEach((key, value) {
+        request.fields[key] = value.toString();
+      });
+
+      final response = await request.send();
 
       if (response.statusCode == 200) {
         // Handle successful response
-        print('Attendance data sent successfully');
+        print('Attendance data and image sent successfully');
       } else {
         // Handle error response
-        print('Failed to send attendance data. Status code: ${response.statusCode}');
+        print('Failed to send attendance data and image. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle network error
-      print('Error sending attendance data: $e');
+      print('Error sending attendance data and image: $e');
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blueGrey.shade500,
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 300.0, horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -82,43 +85,39 @@ class _DataPageState extends State<DataPage> {
                 "Choose Name ",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-
                   color: Colors.white,
                   fontSize: 32.0,
                   fontWeight: FontWeight.bold,
-
-
                 ),
               ),
             ),
-            DropdownButtonFormField<String>(
-              value: selectedData,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedData = newValue!;
-                });
-              },
-              items: dataOptions
-                  .map((option) => DropdownMenuItem<String>(
-                value: option,
-                child: Text(option),
-              ))
-                  .toList() ??
-                  [],
-              hint: Text('Choose Name'),
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: dataOptions.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text('${dataOptions[index]['id']} - ${dataOptions[index]['name']}'),
+                    tileColor: selectedData == dataOptions[index] ? Colors.blue : null,
+                    onTap: () {
+                      setState(() {
+                        selectedData = dataOptions[index];
+                      });
+                    },
+                  );
+                },
+              ),
             ),
             SizedBox(height: 20),
-
             Container(
               margin: const EdgeInsets.symmetric(vertical: 15.0),
               width: double.infinity,
               child: FloatingActionButton(
                 onPressed: () {
-                  // Validate that a data option is selected before sending to the database
                   if (selectedData.isNotEmpty) {
-                    sendAttendanceData();
+                    // Implement your logic when the user clicks the button
+                    sendAttendanceData(selectedData['id']);
                   } else {
-                    // Show an error message if no data option is selected
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -143,8 +142,7 @@ class _DataPageState extends State<DataPage> {
                   borderRadius: BorderRadius.circular(30.0),
                 ),
                 child: const Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 14.0),
+                  padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 14.0),
                   child: Text(
                     "Attend",
                     style: TextStyle(color: Colors.white),
@@ -159,3 +157,4 @@ class _DataPageState extends State<DataPage> {
     );
   }
 }
+

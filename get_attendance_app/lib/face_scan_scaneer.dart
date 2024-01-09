@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get_attendance_app/sender.dart';
 import 'attendance_page.dart';
 import 'datapage.dart';
+import 'dart:io';
+import 'attendance_data.dart';
+
+import 'displayname.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({Key? key, required this.cameras}) : super(key: key);
@@ -29,26 +33,27 @@ class _CameraPageState extends State<CameraPage> {
     }
     try {
       final XFile picture = await _cameraController.takePicture();
+      final File imageFile = File(picture.path);
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => DataPage(),
+          builder: (context) => DisplayNamesPage(imageFile: imageFile),
 
         ),
       );
 
 
-      if (result == 'picture_taken') {
-        _cameraController.dispose();
-        Navigator.pop(context); // Pop the current route
+      if (result is AttendanceData) {
+        sendAttendanceData(result.selectedData, result.imageFile);
       }
-
-    }
-    on CameraException catch (e) {
+    } on CameraException catch (e) {
       debugPrint('Error occurred while taking picture: $e');
     }
-
   }
+
+
+
+
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
@@ -119,4 +124,6 @@ class _CameraPageState extends State<CameraPage> {
       ),
     );
   }
+
+  void sendAttendanceData(String selectedData, File imageFile) {}
 }
