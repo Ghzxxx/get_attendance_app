@@ -27,7 +27,7 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
 
   Future<void> fetchDataOptions() async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8000/api/peserta-names'));
+      final response = await http.get(Uri.parse('https://6f25-103-127-65-56.ngrok-free.app/api/peserta-names'));
       print('Response status code: ${response.statusCode}');
       print('Response body: ${response.body}');
 
@@ -50,7 +50,11 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
 
   Future<void> sendAttendanceData(int selectedId) async {
     if (selectedData != null) {
-      final apiUrl = 'http://10.0.2.2:8000/api/receive-data';
+
+
+      // Replace the following with your actual API endpoint and logic to send data to the database
+      final apiUrl = 'https://6f25-103-127-65-56.ngrok-free.app/api/receive-data';
+
       final Map<String, dynamic> requestData = {
         'selectedId': selectedId.toString(),
       };
@@ -128,6 +132,7 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
       backgroundColor: Colors.blueGrey.shade500,
       body: Container(
         padding: EdgeInsets.all(16.0),
+        margin: EdgeInsets.only(top: 24.0),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(10.0),
@@ -138,7 +143,7 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
           children: [
             const Center(
               child: Text(
-                "Choose Name ",
+                "Pilih Nama Anda ",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -147,7 +152,7 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 15),
             Expanded(
               child: ListView.builder(
                 itemCount: dataOptions.length,
@@ -155,16 +160,21 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
                   return Card(
                     elevation: 5.0,
                     margin: EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50.0), // Sesuaikan dengan tingkat kebulatan yang diinginkan
+                    ),
                     child: ListTile(
                       title: Text(
                         dataOptions[index]['name'],
                         style: TextStyle(
                           fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                       tileColor: selectedData == dataOptions[index] ? Color(0xFF2D3250) : Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0), // Sesuaikan dengan tingkat kebulatan yang diinginkan
+                      ),
                       onTap: () {
                         setState(() {
                           selectedData = dataOptions[index];
@@ -211,7 +221,10 @@ class _DisplayNamesPageState extends State<DisplayNamesPage> {
                   padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 14.0),
                   child: Text(
                     "Attend",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18.0,
+                    ),
                   ),
                 ),
               ),

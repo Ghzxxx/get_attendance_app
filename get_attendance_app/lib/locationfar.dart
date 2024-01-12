@@ -1,7 +1,7 @@
 import 'dart:io';
+import 'package:Absensi_Magang_Get/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:get_attendance_app/splashscreen.dart';
 import 'package:flutter/services.dart';
 
 class LocationFarScreen extends StatelessWidget {

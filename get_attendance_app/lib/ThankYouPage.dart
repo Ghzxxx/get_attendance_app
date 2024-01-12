@@ -1,29 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Import services
+import 'dart:io';
+
+
+
+
+
+
 
 class ThankYouPage extends StatelessWidget {
+
+  Future<void> exitApp() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      exit(0); // This will exit the app on Android and iOS
+    } else {
+      // Handle other platforms if needed
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Terima Kasih'),
-      ),
+      backgroundColor: Colors.blueGrey.shade500,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Terima kasih sudah login!',
-              style: TextStyle(fontSize: 24.0),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 15.0),
+              child: const Text(
+                "Terima Kasih Telah Melakukan Absensi.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, height: 1.5),
+              ),
             ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                // Exit the app when the button is pressed
-                SystemNavigator.pop(); // Exit the app
-              },
-              child: Text('Keluar App'),
+        Container(
+        margin: const EdgeInsets.symmetric(vertical: 15.0),
+        width: double.infinity,
+        child: FloatingActionButton(
+          onPressed: exitApp,
+          elevation: 10.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: 12.0, vertical: 14.0),
+            child: Text(
+              "Exit",
+              style: TextStyle(color: Colors.white),
             ),
+          ),
+        ),
+      )
+
           ],
         ),
       ),

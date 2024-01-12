@@ -1,11 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:get_attendance_app/sender.dart';
-import 'attendance_page.dart';
-import 'datapage.dart';
 import 'dart:io';
 import 'attendance_data.dart';
-
 import 'displayname.dart';
 
 class CameraPage extends StatefulWidget {

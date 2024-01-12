@@ -1,8 +1,7 @@
 import 'dart:io';
-
+import 'package:Absensi_Magang_Get/face_scan_scaneer.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:get_attendance_app/face_scan_scaneer.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 
 import 'api.dart';
@@ -35,10 +34,15 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
   void _scanQR() async {
     try {
       String? barcodeScanRes = await scanner.scan();
-      if (barcodeScanRes != null) {
-        bool isValid = true;  //await API.checkQRCodeValidity(barcodeScanRes);
+      print("Scanned QR Code: $barcodeScanRes");
 
-        if (isValid) {
+      if (barcodeScanRes != null) {
+        Map<String, dynamic> response = await API.checkQRCodeValidity(barcodeScanRes);
+
+        String status = response['status'];
+        String message = response['message'] ?? 'No message available';
+
+        if (status == 'success') {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -52,8 +56,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text("QR Code Error"),
-                content: Text(
-                    "The scanned QR code is not valid. Please try again."),
+                content: Text(message),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -70,30 +73,6 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
       }
     } catch (e) {
       print("Error scanning QR code: $e");
-
-      if (e is SocketException) {
-        // Handle network error gracefully
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Network Error $e"),
-              content: Text(
-                  "Unable to connect to the server. Please check your internet connection."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        print("Unknown error: $e");
-      }
     }
   }
 

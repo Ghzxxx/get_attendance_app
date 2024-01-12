@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get_attendance_app/home.dart';
+
 import 'package:geolocator/geolocator.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -4,29 +4,30 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class API {
-  static const String Connect = "http://192.168.1.6:8000/api";
+  static const String Connect = "https://6f25-103-127-65-56.ngrok-free.app/api";
 
-  static Future<bool> checkQRCodeValidity(String qrCode) async {
+  static Future<Map<String, dynamic>> checkQRCodeValidity(String qrCode) async {
     try {
-      final response = await http.get(
-        Uri.parse('$Connect/qrcode?barcodeScanRes=$qrCode'),
+      final response = await http.post(
+        Uri.parse('$Connect/validate-qrcode-api?barcodeScanRes=$qrCode'),
         headers: {
           'Content-Type': 'application/json',
         },
       );
 
       if (response.statusCode == 200) {
-        return true;
+        // Parse the response body as JSON
+        final Map<String, dynamic> data = json.decode(response.body);
+        return data;
       } else {
-        throw Exception('Failed to check QR code validity');
+        throw Exception('Failed to check QR code validity: ${response.statusCode}');
       }
-    } catch (e) {
-      if (e is SocketException) {
-        print("Network error: $e");
-      } else {
-        print("Error checking QR code validity: $e");
-      }
+    } on SocketException catch (e) {
+      print("Network error: $e");
       throw e;
+    } catch (e) {
+      print("Error checking QR code validity: $e");
+      throw Exception('Failed to check QR code validity');
     }
   }
 
